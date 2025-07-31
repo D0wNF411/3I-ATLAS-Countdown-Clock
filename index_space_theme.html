@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3I/ATLAS Countdown</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      background: black;
+      font-family: 'Orbitron', sans-serif;
+      color: white;
+      text-align: center;
+    }
+
+    /* Starfield */
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    /* Title */
+    h1 {
+      margin-top: 50px;
+      font-size: 2.5em;
+      color: #00eaff;
+      text-shadow: 0 0 20px #00eaff, 0 0 40px #00eaff;
+    }
+
+    /* Countdown text */
+    #countdown {
+      margin-top: 30px;
+      font-size: 3em;
+      color: #fffa9d;
+      text-shadow: 0 0 10px #ffd700, 0 0 30px #ffd700;
+    }
+
+    /* Description */
+    p {
+      font-size: 1.2em;
+      color: #ccc;
+      margin-top: 20px;
+    }
+
+    /* Comet */
+    #comet {
+      position: absolute;
+      width: 120px;
+      top: 20%;
+      left: -150px;
+      animation: flyby 20s linear infinite;
+    }
+
+    @keyframes flyby {
+      from { left: -200px; top: 20%; transform: rotate(15deg); }
+      to { left: 120%; top: 10%; transform: rotate(15deg); }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="starfield"></canvas>
+
+  <h1>3I/ATLAS Countdown</h1>
+  <div id="countdown"></div>
+  <p>Counting down to its closest approach to Earth - November 27th, 2025</p>
+  <img id="comet" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Comet_CGI.png/320px-Comet_CGI.png" alt="comet">
+
+  <script>
+    // Countdown logic
+    const closestApproach = new Date("2025-11-27T00:00:00Z").getTime();
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = closestApproach - now;
+      if (distance < 0) {
+        document.getElementById("countdown").innerHTML = "ARRIVAL!";
+        return;
+      }
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      document.getElementById("countdown").innerHTML = 
+        `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // Starfield animation
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function createStars(count) {
+      stars = [];
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          z: Math.random() * canvas.width
+        });
+      }
+    }
+    createStars(200);
+
+    function animateStars() {
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      for (let star of stars) {
+        star.z -= 2;
+        if (star.z <= 0) {
+          star.x = Math.random() * canvas.width;
+          star.y = Math.random() * canvas.height;
+          star.z = canvas.width;
+        }
+        const k = 128.0 / star.z;
+        const sx = star.x * k + canvas.width / 2;
+        const sy = star.y * k + canvas.height / 2;
+        if (sx >= 0 && sx <= canvas.width && sy >= 0 && sy <= canvas.height) {
+          const size = (1 - star.z / canvas.width) * 3;
+          ctx.fillStyle = 'white';
+          ctx.fillRect(sx, sy, size, size);
+        }
+      }
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+  </script>
+</body>
+</html>
