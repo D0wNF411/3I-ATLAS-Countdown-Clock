@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3I/ATLAS Closest Approach Countdown</title>
+  <style>
+    @keyframes glow {
+      0% {text-shadow: 0 0 6px rgba(0,255,0,.3);}
+      50% {text-shadow: 0 0 18px rgba(0,255,0,.8);}
+      100% {text-shadow: 0 0 6px rgba(0,255,0,.3);}
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      background: radial-gradient(circle at 50% 30%, #0a0a0a, #000);
+      color: #9eff9e;
+      font-family: Consolas, Monaco, 'Courier New', monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .wrap {
+      text-align: center;
+    }
+    h1 {
+      letter-spacing: .08em;
+      font-weight: 600;
+      margin: 0 0 .4rem 0;
+    }
+    .tgt {
+      font-size: .95rem;
+      opacity: .8;
+      margin-bottom: 1.2rem;
+    }
+    .clock {
+      font-size: clamp(28px, 8vw, 96px);
+      font-variant-numeric: tabular-nums;
+      animation: glow 2.5s infinite;
+    }
+    .units {
+      font-size: clamp(12px, 2.4vw, 18px);
+      opacity: .75;
+      margin-top: .5rem;
+    }
+    footer {
+      position: fixed;
+      bottom: 12px;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 12px;
+      color: #7ddc7d;
+      opacity: .7;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>3I/ATLAS — Closest Approach to Earth</h1>
+    <div class="tgt">Target: <strong>Projected ~29 Dec 2025 (UTC)</strong></div>
+    <div id="countdown" class="clock">Initializing…</div>
+    <div class="units">days : hours : minutes : seconds</div>
+  </div>
+  <footer>3I/ATLAS live countdown — runs offline in your browser</footer>
+  <script>
+    // Set target (UTC). Change if needed.
+    const TARGET_ISO_UTC = "2025-12-29T00:00:00Z"; // e.g., 2025-12-29T00:00:00Z
+    const target = new Date(TARGET_ISO_UTC).getTime();
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function tick() {
+      const now = Date.now();
+      let diff = target - now;
+
+      const el = document.getElementById('countdown');
+      if (!el) return;
+
+      if (diff <= 0) {
+        el.textContent = "ARRIVAL";
+        return;
+      }
+
+      const d = Math.floor(diff / (1000*60*60*24));
+      diff -= d*(1000*60*60*24);
+      const h = Math.floor(diff / (1000*60*60));
+      diff -= h*(1000*60*60);
+      const m = Math.floor(diff / (1000*60));
+      diff -= m*(1000*60);
+      const s = Math.floor(diff / 1000);
+
+      el.textContent = `${d} : ${pad(h)} : ${pad(m)} : ${pad(s)}`;
+    }
+    tick();
+    setInterval(tick, 1000);
+  </script>
+</body>
+</html>
